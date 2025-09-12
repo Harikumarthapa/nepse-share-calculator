@@ -30,9 +30,10 @@ interface IPOResults {
   dailyBreakdown: Array<{
     day: number;
     startValue: number;
-    priceIncrease: number;
-    finalValue: number;
-    totalPriceIncrease: number;
+    dailyIncrease: number;
+    endValue: number;
+    totalGain: number;
+    portfolioValue: number;
   }>;
 }
 
@@ -92,19 +93,21 @@ const IPOCalculator: React.FC = () => {
       
       for (let day = 1; day <= circuits; day++) {
         const startValue = currentPrice;
-        const priceIncrease = currentPrice * 0.10; // 10% increase
-        const finalValue = currentPrice + priceIncrease;
-        const totalPriceIncrease = finalValue - initialListedPrice;
+        const dailyIncrease = currentPrice * 0.10; // 10% increase
+        const endValue = currentPrice + dailyIncrease;
+        const totalGain = (endValue - initialListedPrice) * (sharesAllotted ?? 0);
+        const portfolioValue = endValue * (sharesAllotted ?? 0);
         
         dailyBreakdown.push({
           day,
           startValue,
-          priceIncrease,
-          finalValue,
-          totalPriceIncrease
+          dailyIncrease,
+          endValue,
+          totalGain,
+          portfolioValue,
         });
         
-        currentPrice = finalValue;
+        currentPrice = endValue;
       }
       
       finalSharePrice = currentPrice;
@@ -120,28 +123,30 @@ const IPOCalculator: React.FC = () => {
       
       for (let day = 1; day <= equivalentDays; day++) {
         const startValue = currentPrice;
-        let priceIncrease: number;
+        let dailyIncrease: number;
         
         if (day === equivalentDays) {
           // Last day - calculate remaining percentage
           const remainingPercentage = totalReturnPercentage - ((day - 1) * 10);
-          priceIncrease = currentPrice * (remainingPercentage / 100);
+          dailyIncrease = currentPrice * (remainingPercentage / 100);
         } else {
-          priceIncrease = currentPrice * 0.10; // 10% increase
+          dailyIncrease = currentPrice * 0.10; // 10% increase
         }
         
-        const finalValue = currentPrice + priceIncrease;
-        const totalPriceIncrease = finalValue - initialListedPrice;
+        const endValue = currentPrice + dailyIncrease;
+        const totalGain = (endValue - initialListedPrice) * (sharesAllotted ?? 0);
+        const portfolioValue = endValue * (sharesAllotted ?? 0);
         
         dailyBreakdown.push({
           day,
           startValue,
-          priceIncrease,
-          finalValue,
-          totalPriceIncrease
+          dailyIncrease,
+          endValue,
+          totalGain,
+          portfolioValue,
         });
         
-        currentPrice = finalValue;
+        currentPrice = endValue;
       }
     } else {
       return null;
@@ -373,9 +378,10 @@ const IPOCalculator: React.FC = () => {
                                 <TableRow>
                                   <TableHead className="text-xs">Day</TableHead>
                                   <TableHead className="text-xs">Start Value</TableHead>
-                                  <TableHead className="text-xs">Price Increase</TableHead>
-                                  <TableHead className="text-xs">Final Value</TableHead>
-                                  <TableHead className="text-xs">Total Increase</TableHead>
+                                  <TableHead className="text-xs">Daily Increase</TableHead>
+                                  <TableHead className="text-xs">End Value</TableHead>
+                                  <TableHead className="text-xs">Total Gain</TableHead>
+                                  <TableHead className="text-xs">Portfolio Value</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
@@ -383,9 +389,10 @@ const IPOCalculator: React.FC = () => {
                                   <TableRow key={day.day}>
                                     <TableCell className="text-xs">{day.day}</TableCell>
                                     <TableCell className="text-xs">{formatCurrency(day.startValue)}</TableCell>
-                                    <TableCell className="text-xs text-green-600">+{formatCurrency(day.priceIncrease)}</TableCell>
-                                    <TableCell className="text-xs font-medium">{formatCurrency(day.finalValue)}</TableCell>
-                                    <TableCell className="text-xs text-green-600">+{formatCurrency(day.totalPriceIncrease)}</TableCell>
+                                    <TableCell className="text-xs text-green-600">+{formatCurrency(day.dailyIncrease ?? 0)}</TableCell>
+                                    <TableCell className="text-xs font-medium">{formatCurrency(day.endValue ?? 0)}</TableCell>
+                                    <TableCell className="text-xs text-green-600">+{formatCurrency(day.totalGain ?? 0)}</TableCell>
+                                    <TableCell className="text-xs font-medium">{formatCurrency(day.portfolioValue ?? 0)}</TableCell>
                                   </TableRow>
                                 ))}
                               </TableBody>

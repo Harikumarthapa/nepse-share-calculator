@@ -57,7 +57,7 @@ const NEPSECalculator: React.FC = () => {
   return (
     <Card className="w-full mx-auto shadow-lg">
       <CardHeader className="bg-nepse-blue text-white flex flex-row justify-between items-center p-4 sm:p-6">
-  <h2 className="text-lg sm:text-xl font-bold">
+  <h2 className="text-lg sm:text-xl font-bold text-white">
     {t('calculator.title')}
   </h2>
   <LanguageToggle />

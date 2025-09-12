@@ -7,8 +7,7 @@ import InputSummary from './results/InputSummary';
 import FeeBreakdown from './results/FeeBreakdown';
 import TaxCalculation from './results/TaxCalculation';
 import FinalResult from './results/FinalResult';
-import html2canvas from 'html2canvas';
-import html2pdf from 'html2pdf.js';
+
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -36,8 +35,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, inputs }) => {
     });
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!resultsRef.current) return;
+
+    const { default: html2pdf } = await import('html2pdf.js');
 
     const element = resultsRef.current;
     const date = formattedDate();
@@ -82,6 +83,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, inputs }) => {
     if (!resultsRef.current) return;
 
     try {
+      const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(resultsRef.current, {
         scale: 2,
         useCORS: true,
